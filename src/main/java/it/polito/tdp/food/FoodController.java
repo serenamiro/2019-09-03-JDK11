@@ -5,8 +5,9 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
-import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Model2;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,7 +17,7 @@ import javafx.scene.control.TextField;
 
 public class FoodController {
 	
-	private Model model;
+	private Model2 model;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -40,7 +41,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -48,21 +49,63 @@ public class FoodController {
     @FXML
     void doCammino(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco cammino peso massimo...");
+    	txtResult.appendText("Cerco cammino peso massimo...\n\n");
+    	
+    	String partenza = boxPorzioni.getValue();
+    	if(partenza == null) {
+    		txtResult.appendText("ERRORE: devi selezionare una porzione.\n");
+    		return;
+    	}
+    	
+    	String input = txtPassi.getText();
+    	try {
+    		Integer passi = Integer.parseInt(input);
+    		List<String> cammino = model.calcolaCammino(partenza, passi);
+    		if(cammino != null) {
+    			txtResult.appendText("Peso totale: "+model.getPesoMax()+"\n");
+    			for(String s : cammino) {
+    				txtResult.appendText(s+"\n");
+    			}
+    		} else {
+    			txtResult.appendText("Non esiste cammino.\n");
+    		}
+    	} catch (NumberFormatException e) {
+    		txtResult.appendText("Inserire un numero valido.\n");
+    	}
     }
 
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
+    	txtResult.appendText("Cerco porzioni correlate...\n\n");
+    	String partenza = boxPorzioni.getValue();
     	
+    	if(partenza == null) {
+    		txtResult.appendText("ERRORE: scegliere un tipo di porzione. \n");
+    		return;
+    	}
+    	
+    	txtResult.appendText(model.getVerticiViciniConPeso(partenza));
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	txtResult.appendText("Creazione grafo...\n\n");
     	
+    	String input = txtCalorie.getText();
+    	try {
+    		Integer calorie = Integer.parseInt(input);
+    		model.creaGrafo(calorie);
+    		txtResult.appendText("Grafo creato\n");
+    		txtResult.appendText("vertici: "+model.nVertici()+"\n");
+    		txtResult.appendText("archi: "+model.nArchi()+"\n");
+    		
+    		boxPorzioni.getItems().addAll(model.getVertici());
+    		
+    	} catch (NumberFormatException e) {
+    		txtResult.appendText("Inserire un numero valido.\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -77,7 +120,7 @@ public class FoodController {
 
     }
     
-    public void setModel(Model model) {
-    	this.model = model;
+    public void setModel(Model2 model2) {
+    	this.model = model2;
     }
 }

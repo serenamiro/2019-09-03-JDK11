@@ -2,7 +2,7 @@ package it.polito.tdp.food;
 
 import javafx.application.Application;
 
-import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Model2;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -16,7 +16,7 @@ public class EntryPoint extends Application {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Food.fxml"));
 		BorderPane root = loader.load();
 		FoodController controller = loader.getController();
-		Model model = new Model();
+		Model2 model = new Model2();
 		controller.setModel(model);
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(getClass().getResource("/styles/Styles.css").toExternalForm());
